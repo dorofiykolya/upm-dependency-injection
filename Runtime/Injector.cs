@@ -66,9 +66,14 @@ namespace Injections
 
         public void Register(Type type, IResolver resolver)
         {
-            _resolvers[type] = resolver ?? throw new NullReferenceException();
-            var hook = resolver as IResolverHook;
-            hook?.OnRegister(this);
+            var current = GetResolver(type, false);
+            if (current != resolver)
+            {
+                UnRegister(type);
+                _resolvers[type] = resolver ?? throw new NullReferenceException();
+                var hook = resolver as IResolverHook;
+                hook?.OnRegister(this);
+            }
         }
 
         public void UnRegister(Type type)
